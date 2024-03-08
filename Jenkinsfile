@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/imkiran13/docker-spring-boot-app.git']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/imkiran13/docker-spring-boot-app.git']])
             }
         }
         
@@ -20,7 +20,9 @@ pipeline {
         stage ("Build Image") {
             steps {
                 script {
-                    docker.build registry
+                     script {
+                    dockerImage = docker.build registry 
+                    dockerImage.tag("$BUILD_NUMBER")
                 }
             }
         }
@@ -28,8 +30,8 @@ pipeline {
         stage ("Push to ECR") {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 604568061403.dkr.ecr.ap-south-1.amazonaws.com/my-docker-repo"
-                    sh "604568061403.dkr.ecr.ap-south-1.amazonaws.com/my-docker-repo:latest"
+                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 604568061403.dkr.ecr.ap-south-1.amazonaws.com"
+                    sh "docker push 604568061403.dkr.ecr.ap-south-1.amazonaws.com/my-docker-repo:$BUILD_NUMBER"
                     
                 }
             }
