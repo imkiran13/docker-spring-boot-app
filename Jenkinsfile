@@ -38,6 +38,17 @@ pipeline {
                 }
             }
         }
+        stage ("Helm package") {
+            steps {
+                    sh "helm package springboot"
+                }
+            }
+                
+        stage ("Helm install") {
+            steps {
+                    sh "helm upgrade myrelease-21 springboot-0.1.0.tgz"
+                }
+            }
         
         
     }
